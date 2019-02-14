@@ -1,3 +1,4 @@
+from DavisPutnam import DavisPutnam
 from cnf import CNF
 import numpy as np
 import copy
@@ -46,5 +47,8 @@ with open('sudoku-rules.txt') as f:
 
 example_puzzles = sudokus_to_DIMACS(sudokufile, rules)
 for puz in example_puzzles[:10]:
-    cnf = CNF(puz)
-    solve(cnf)
+    # cnf = CNF(puz)
+    # solve(cnf)
+    dp = DavisPutnam(puz)
+    dp.remove_unit_literals()
+    # print(dp.clause_matrix)
