@@ -30,11 +30,11 @@ class DavisPutnam():
         clauses_with_unit_literals = np.where(literal_count_per_clause == 1)[0]
         pos_literal_indices = np.where(self.clause_matrix[clauses_with_unit_literals, :] == 1)[1]
         self.assign[pos_literal_indices] = 1
-        self.clause_matrix[:, pos_literal_indices] = 0
         neg_literal_indices = np.where(self.clause_matrix[clauses_with_unit_literals, :] == -1)[1]
         self.assign[neg_literal_indices] = -1
         clauses_to_remove = np.where(self.clause_matrix[:, pos_literal_indices] == 1)[0]
         self.clause_matrix = np.delete(self.clause_matrix, clauses_to_remove, axis=0)
+        self.clause_matrix[:, pos_literal_indices] = 0
         clauses_to_remove = np.where(self.clause_matrix[:, neg_literal_indices] == -1)[0]
         self.clause_matrix = np.delete(self.clause_matrix, clauses_to_remove, axis=0)
         self.clause_matrix[:, neg_literal_indices] = 0
@@ -53,7 +53,7 @@ class DavisPutnam():
         return np.random.choice(np.where(self.assign == 0)[0])
 
     def solve(self):
-        # self.simplify_unit_clauses()
+        self.simplify_unit_clauses()
         # self.simplify_pure_literals()
         if self.clause_matrix.shape[0] == 0:
             return True
@@ -78,7 +78,7 @@ class DavisPutnam():
 
     # print solution based on assignments
     def print_sol(self):
-        grid = np.zeros((9, 9))
+        grid = np.zeros((9, 9), dtype=int)
         for (i, key) in enumerate(self.literals):
             if self.assign[i] == 1:
                 x, y = str(key)[0], str(key)[1]

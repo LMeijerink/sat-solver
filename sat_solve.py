@@ -52,5 +52,4 @@ for puz in example_puzzles[:10]:
     dp = DavisPutnam(puz)
     dp.solve()
     dp.print_sol()
-    break
     # print(dp.clause_matrix)
