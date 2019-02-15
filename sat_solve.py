@@ -50,5 +50,7 @@ for puz in example_puzzles[:10]:
     # cnf = CNF(puz)
     # solve(cnf)
     dp = DavisPutnam(puz)
-    dp.remove_unit_literals()
+    dp.solve()
+    dp.print_sol()
+    break
     # print(dp.clause_matrix)
