@@ -1,15 +1,22 @@
+import time
 from cnf import CNF
 import numpy as np
 import copy
 
+
 def solve(cnf):
+    """
+    Solve a SAT problem
+    :param cnf: Object containing the problem in closed normal form
+    :return: True if solvable else False
+    """
     cnf.simplify()
     if cnf.clauses == []:
         cnf.print_sol()
         return True
     if [] in cnf.clauses:
         return False
-    #split
+    # Split
     s = cnf.random_split()
     cnf1 = copy.deepcopy(cnf)
     cnf1.clauses += [[s]]
@@ -22,8 +29,14 @@ def solve(cnf):
             return True
     return False
 
-# Takes in file of sudokus and returns list of puzzles in DIMACS format
-def sudokus_to_DIMACS(filename, rules): 
+
+def sudokus_to_DIMACS(filename, rules):
+    """
+    Takes in file of sudokus and returns a list of puzzles in DIMACS format
+    :param filename: Filename of sudoku problems
+    :param rules: String of sudoku rules
+    :return: String containing rules and sudoku problems in DIMACS format
+    """
     puzzles = []
     with open(filename, 'r') as f:
         for line in f.read().splitlines():
@@ -32,19 +45,24 @@ def sudokus_to_DIMACS(filename, rules):
             clauses = rules
             for x in range(len(matrix)):
                 for y in range(len(matrix[x])):
-                    if matrix[x,y] != '.':
-                        clauses += str(x +1) + str(y+1) + matrix[x,y] + ' 0\n'
+                    if matrix[x, y] != '.':
+                        clauses += str(x + 1) + str(y + 1) + matrix[x, y] + ' 0\n'
             puzzles += [clauses]
     return puzzles
-    
 
-sudokufile = '1000 sudokus.txt'
 
-#load in rules, same for every sudoku
-with open('sudoku-rules.txt') as f:
-    rules = f.read()
+if __name__ == '__main__':
+    start_time = time.time()
+    sudokufile = '1000 sudokus.txt'
+    n_puzzles = 10
 
-example_puzzles = sudokus_to_DIMACS(sudokufile, rules)
-for puz in example_puzzles[:10]:
-    cnf = CNF(puz)
-    solve(cnf)
+    # Load in rules, same for every sudoku
+    with open('sudoku-rules.txt') as f:
+        rules = f.read()
+
+    example_puzzles = sudokus_to_DIMACS(sudokufile, rules)
+    for puz in example_puzzles[:n_puzzles]:
+        cnf = CNF(puz)
+        solve(cnf)
+
+    print("Solved in %s seconds" % (time.time() - start_time))
