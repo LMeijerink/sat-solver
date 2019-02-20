@@ -12,6 +12,7 @@ class CNF:
         self.assign = defaultdict(int)  # False = -1, True = 1, unassigned = 0
         self.variables = set()
         self.load_clauses(dimacs_str)
+        self.lefv_clause = []
 
     def load_clauses(self, dimacs_str):
         """
@@ -69,15 +70,19 @@ class CNF:
         for clause in self.clauses:
             unassigned_vars = []
             sat_clause = False
+            clause_with_elim_variable = False
             for var in clause:
                 if self.assign[np.abs(var)] * var > 0:
                     sat_clause = True  # so clause does not need to be included
                 elif self.assign[np.abs(var)] * var < 0:
-                    pass  # false variable so does not need to be included in clause
+                    # false variable so does not need to be included in clause
+                    clause_with_elim_variable = True
                 else:
                     unassigned_vars += [var]
             if not sat_clause:
                 unsat_clauses += [unassigned_vars]
+                if clause_with_elim_variable:
+                    self.lefv_clause = list(clause)
         self.clauses = unsat_clauses
 
     def simplify(self):
@@ -99,6 +104,18 @@ class CNF:
         """
         variables = [v for v in self.variables if self.assign[v] == 0]
         return np.random.choice(variables)
+
+    def lefv_split(self):
+        """
+        Choose a free variable from the last encountered unsatisfied clause during unit propagation
+        :return: Chosen variable
+        """
+        lefvs = [v for v in self.lefv_clause if self.assign[np.abs(v)] == 0]
+        if len(lefvs) != 0:
+            return np.random.choice(lefvs)
+        else:
+            variables = [v for v in self.variables if self.assign[v] == 0]
+            return np.random.choice(variables)
 
     def print_sol(self):
         """
