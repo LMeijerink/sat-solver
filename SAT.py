@@ -3,15 +3,18 @@ from sat_solve import solve
 from cnf import CNF
 
 
-def write_sol_to_file(cnf, output_file):
+def write_sol_to_file(cnf, output_file, satisfiable=True):
 	"""
 	Write solution of a SAT problem to a file
+	:param cnf: CNF object
 	:param output_file: Output file name
+	:param satisfiable: Boolean indicating whether the problem was satisfiable or not
 	:return: None
 	"""
 	with open(output_file, 'w') as f:
-		for variable in cnf.variables:
-			f.write(str(cnf.assign[variable] * variable) + " 0\n")
+		if satisfiable:
+			for variable in cnf.variables:
+				f.write(str(cnf.assign[variable] * variable) + " 0\n")
 	f.close()		
 
 
@@ -27,7 +30,7 @@ if __name__ == '__main__':
 		parser.exit(1)
 
 	input_file = args['inputfile']
-	output_file = 'solution.txt'
+	output_file = input_file.split('.')[0] + '.out'
 
 	with open(input_file) as f:
 		dimacs_str = f.read()
@@ -46,7 +49,8 @@ if __name__ == '__main__':
 
 	if solve(cnf, heuristic):
 		print("Problem is satisfiable. Solution written to %s" % output_file)
-		write_sol_to_file(cnf, output_file)
+		write_sol_to_file(cnf, output_file, satisfiable=True)
 	else:
 		print("Problem is unsatisfiable")
+		write_sol_to_file(cnf, output_file, satisfiable=False)
 						
