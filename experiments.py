@@ -2,13 +2,11 @@ import numpy as np
 from collections import defaultdict
 from sat_solve import sudokus_to_DIMACS
 import matplotlib.pyplot as plt
-import time
 from cnf import CNF
 from sat_solve import SATSolver
 
 
 def load_sudoku_rules(sudoku_rules_file):
-    # Load in rules, same for every sudoku
     with open(sudoku_rules_file) as f:
         rules = f.read()
     return rules
