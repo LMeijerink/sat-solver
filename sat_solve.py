@@ -4,36 +4,51 @@ import numpy as np
 import copy
 
 
-def solve(cnf, heuristic=None):
-    """
-    Solve a SAT problem
-    :param cnf: Object containing the problem in closed normal form
-    :return: True if solvable else False
-    """
-    global splits, backtracks
-    cnf.simplify()
-    if cnf.clauses == []:
-        # cnf.print_sol()
-        return True
-    if [] in cnf.clauses:
-        return False
-    # Split
-    if heuristic is None:
-        s = cnf.random_split()
-    elif heuristic == 'lefv':
-        s = cnf.lefv_split()
-    splits += 1
-    cnf1 = copy.deepcopy(cnf)
-    cnf1.clauses += [[s]]
-    if solve(cnf1, heuristic):
-        return True
-    else:
-        backtracks += 1
-        cnf2 = copy.deepcopy(cnf)
-        cnf2.clauses += [[-s]]
-        if solve(cnf2, heuristic):
+class SATSolver:
+
+    def __init__(self, heuristic=None):
+        """
+        SAT solver
+        :param heuristic: Heuristic to use for solving. Empty for vanilla Davis Putnam
+        """
+        self.splits = 0
+        self.backtracks = 0
+        self.heuristic = heuristic
+
+    def solve(self, cnf):
+        """
+        Solve a SAT problem
+        :param cnf: Object containing the problem in closed normal form
+        :return: True if solvable else False
+        """
+        if not cnf.simplify():
+            return False
+        if cnf.clauses == []:
+            # cnf.print_sol()
             return True
-    return False
+        if [] in cnf.clauses:
+            return False
+        # Split
+        if self.heuristic is None:
+            s = cnf.random_split()
+        elif self.heuristic == 'LEFV':
+            s = cnf.lefv_split()
+        self.splits += 1
+        cnf1 = copy.deepcopy(cnf)
+        cnf1.clauses += [[s]]
+        if self.solve(cnf1):
+            cnf.assign = cnf1.assign
+            cnf.clauses = cnf1.clauses
+            return True
+        else:
+            self.backtracks += 1
+            cnf2 = copy.deepcopy(cnf)
+            cnf2.clauses += [[-s]]
+            if self.solve(cnf2):
+                cnf.assign = cnf2.assign
+                cnf.clauses = cnf2.clauses
+                return True
+        return False
 
 
 def sudokus_to_DIMACS(filename, rules):
@@ -82,9 +97,10 @@ if __name__ == '__main__':
         backtracks = 0
         print("Puzzle number %d" % i)
         cnf_dp = CNF(puz)
-        solve(cnf_dp, heuristic=None)
-        splits_dp.append(splits)
-        backtracks_dp.append(backtracks)
+        sudoku_solver = SATSolver(heuristic=None)
+        sudoku_solver.solve(cnf_dp)
+        splits_dp.append(sudoku_solver.splits)
+        backtracks_dp.append(sudoku_solver.backtracks)
         i += 1
     dp_time = time.time() - start_time
 
@@ -96,9 +112,10 @@ if __name__ == '__main__':
         backtracks = 0
         print("Puzzle number %d" % i)
         cnf_lefv = CNF(puz)
-        solve(cnf_lefv, heuristic='lefv')
-        splits_lefv.append(splits)
-        backtracks_lefv.append(backtracks)
+        sudoku_solver = SATSolver(heuristic="LEFV")
+        sudoku_solver.solve(cnf_lefv)
+        splits_lefv.append(sudoku_solver.splits)
+        backtracks_lefv.append(sudoku_solver.backtracks)
         i += 1
     lefv_time = time.time() - start_time
 

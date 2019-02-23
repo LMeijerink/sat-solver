@@ -35,15 +35,19 @@ class CNF:
     def assign_unit_clauses(self):
         """
         Assign value to variables which occur in unit clauses
-        :return: None
+        :return: True if no conflict and False if a conflict in encountered
         """
         non_unit_clauses = []
         for clause in self.clauses:
             if len(clause) == 1:
+                # Conflict encountered
+                if np.sign(clause[0]) == -self.assign[np.abs(clause[0])]:
+                    return False
                 self.assign[np.abs(clause[0])] = np.sign(clause[0])
             else:
                 non_unit_clauses += [clause]
         self.clauses = non_unit_clauses
+        return True
 
     def assign_pure_literals(self):
         """
@@ -93,9 +97,11 @@ class CNF:
         prev_len = float('inf')
         while len(self.clauses) < prev_len:
             prev_len = len(self.clauses)
-            self.assign_unit_clauses()
+            if not self.assign_unit_clauses():
+                return False
             self.assign_pure_literals()
             self.rm_redundant_clauses()
+        return True
 
     def random_split(self):
         """
