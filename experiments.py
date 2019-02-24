@@ -42,7 +42,7 @@ def bin_metrics_by_clues(heuristic, n_puzzles, n_runs, example_puzzles, clues):
 
 
 def plot_splits_backtracks(sudoku_rules_file, sudoku_file, n_puzzles, n_runs):
-
+    width = 0.3
     rules = load_sudoku_rules(sudoku_rules_file)
     example_puzzles, clues = sudokus_to_DIMACS(sudoku_file, rules)
 
@@ -50,21 +50,31 @@ def plot_splits_backtracks(sudoku_rules_file, sudoku_file, n_puzzles, n_runs):
     avg_splits_lefv, avg_backtracks_lefv = bin_metrics_by_clues('LEFV', n_puzzles, n_runs, example_puzzles, clues)
     avg_splits_up, avg_backtracks_up = bin_metrics_by_clues('UP', n_puzzles, n_runs, example_puzzles, clues)
 
+    N = len(avg_splits_dp)
+    ind = np.arange(N)
+    print(ind)
+
     fig, ax = plt.subplots()
-    ax.bar(avg_splits_dp.keys(), avg_splits_dp.values(), color='r', label='DP')
-    ax.bar(avg_splits_lefv.keys(), avg_splits_lefv.values(), color='b', label='LEFV')
-    ax.bar(avg_splits_up.keys(), avg_splits_up.values(), color='g', label='UP')
-    ax.set_xticks(range(16, 26))
+    ax.bar(ind + width, avg_splits_dp.values(), width, color='r', label='DP')
+    ax.bar(ind , avg_splits_up.values(), width, color='y', label='UP')
+    ax.bar(ind + 2*width, avg_splits_lefv.values(), width, color='b', label='LEFV')
+    
+    ax.set_xticks(ind+width)
+    ax.set_xticklabels(avg_backtracks_lefv.keys())
+
     ax.set_xlabel('Number of clues')
     ax.set_ylabel('Average number of splits')
     fig.suptitle('Average number of splits vs number of clues')
     ax.legend()
 
     fig, ax = plt.subplots()
-    ax.bar(avg_backtracks_dp.keys(), avg_backtracks_dp.values(), color='r', label='DP')
-    ax.bar(avg_backtracks_lefv.keys(), avg_backtracks_lefv.values(), color='b', label='LEFV')
-    ax.bar(avg_backtracks_up.keys(), avg_backtracks_up.values(), color='g', label='UP')
-    ax.set_xticks(range(16, 26))
+    ax.bar(ind + width, avg_backtracks_dp.values(), width, color='r', label='DP')
+    ax.bar(ind, avg_backtracks_up.values(), width, color='y', label='UP')
+    ax.bar(ind+2*width, avg_backtracks_lefv.values(), width, color='b', label='LEFV')
+    
+    ax.set_xticks(ind+width)
+
+    ax.set_xticklabels(avg_backtracks_lefv.keys())
     ax.set_xlabel('Number of clues')
     ax.set_ylabel('Average number of backtracks')
     fig.suptitle('Average number of backtracks vs number of clues')
@@ -77,6 +87,6 @@ if __name__ == '__main__':
     sudoku_rules_file = 'sudoku_rules/sudoku-rules.txt'
     sudoku_file = 'test_sudokus/1000 sudokus.txt'
     n_puzzles = 10
-    n_runs = 4
+    n_runs = 1
 
     plot_splits_backtracks(sudoku_rules_file, sudoku_file, n_puzzles, n_runs)
