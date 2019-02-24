@@ -54,8 +54,8 @@ def plot_splits_backtracks(sudoku_rules_file, sudoku_file, n_puzzles, n_runs):
     ind = np.arange(N)
 
     fig, ax = plt.subplots()
-    ax.bar(ind + width, avg_splits_dp.values(), width, color='r', label='DP')
-    ax.bar(ind , avg_splits_up.values(), width, color='y', label='UP')
+    ax.bar(ind , avg_splits_dp.values(), width, color='r', label='DP')
+    ax.bar(ind +width, avg_splits_up.values(), width, color='y', label='UP')
     ax.bar(ind + 2*width, avg_splits_lefv.values(), width, color='b', label='LEFV')
     
     ax.set_xticks(ind+width)
@@ -67,8 +67,8 @@ def plot_splits_backtracks(sudoku_rules_file, sudoku_file, n_puzzles, n_runs):
     ax.legend()
 
     fig, ax = plt.subplots()
-    ax.bar(ind + width, avg_backtracks_dp.values(), width, color='r', label='DP')
-    ax.bar(ind, avg_backtracks_up.values(), width, color='y', label='UP')
+    ax.bar(ind, avg_backtracks_dp.values(), width, color='r', label='DP')
+    ax.bar(ind+width, avg_backtracks_up.values(), width, color='y', label='UP')
     ax.bar(ind+2*width, avg_backtracks_lefv.values(), width, color='b', label='LEFV')
     
     ax.set_xticks(ind+width)
@@ -84,8 +84,8 @@ def plot_splits_backtracks(sudoku_rules_file, sudoku_file, n_puzzles, n_runs):
 
 if __name__ == '__main__':
     sudoku_rules_file = 'sudoku_rules/sudoku-rules.txt'
-    sudoku_file = 'test_sudokus/1000 sudokus.txt'
-    n_puzzles = 10
+    sudoku_file = 'test_sudokus/damnhard.sdk.txt'
+    n_puzzles = 5
     n_runs = 1
 
     plot_splits_backtracks(sudoku_rules_file, sudoku_file, n_puzzles, n_runs)
