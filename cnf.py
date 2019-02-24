@@ -1,6 +1,6 @@
 import numpy as np
 from collections import defaultdict
-
+import copy
 
 class CNF:
     def __init__(self, dimacs_str):
@@ -11,6 +11,7 @@ class CNF:
         self.clauses = []  # clauses as lists
         self.assign = defaultdict(int)  # False = -1, True = 1, unassigned = 0
         self.variables = set()
+        self.occurences = defaultdict(int)
         self.load_clauses(dimacs_str)
         self.lefv_clause = []
 
@@ -30,6 +31,7 @@ class CNF:
                     else:
                         clause += [literal]
                     self.variables.add(np.abs(literal))
+                    self.occurences[literal] += 1
                 self.clauses += [clause]
 
     def assign_unit_clauses(self):
@@ -54,15 +56,11 @@ class CNF:
         Assign value to variables which are pure literls
         :return: None
         """
-        literal_count = defaultdict(int)
-        for clause in self.clauses:
-            for literal in clause:
-                literal_count[literal] += 1
         for var in self.variables:
             if self.assign[var] == 0:
-                if literal_count[var] != 0 and literal_count[-var] == 0:
+                if self.occurences[var] != 0 and self.occurences[-var] == 0:
                     self.assign[var] = 1
-                elif literal_count[-var] != 0 and literal_count[var] == 0:
+                elif self.occurences[-var] != 0 and self.occurences[var] == 0:
                     self.assign[var] = -1
 
     def rm_redundant_clauses(self):
@@ -71,6 +69,7 @@ class CNF:
         :return: None
         """
         unsat_clauses = []
+        self.occurences = defaultdict(int)
         for clause in self.clauses:
             unassigned_vars = []
             sat_clause = False
@@ -83,6 +82,7 @@ class CNF:
                     clause_with_elim_variable = True
                 else:
                     unassigned_vars += [var]
+                    self.occurences[var] += 1
             if not sat_clause:
                 unsat_clauses += [unassigned_vars]
                 if clause_with_elim_variable:
@@ -122,6 +122,58 @@ class CNF:
         else:
             variables = [v for v in self.variables if self.assign[v] == 0]
             return np.random.choice(variables)
+
+
+    def satz(self):
+        """
+        Now: Prop_0, prop is true for each variable
+        """
+        w = defaultdict(int)
+        H = defaultdict(int)
+        minclauses = self.minclauses()
+        for v in self.variables:
+              if (self.assign[v] == 0):
+                if ((self.occurences[v] + self.occurences[-v])/2 >= 14 and (self.occurences[v] >= 4 and self.occurences[-v] >= 4)):
+                    F1 = copy.deepcopy(self)
+                    F2 = copy.deepcopy(self)
+                    F1.clauses += [[v]]
+                    F2.clauses += [[-v]]
+                    F1.simplify()
+                    F2.simplify()
+                    unsat_F1 = [] in F1.clauses
+                    unsat_F2 = [] in F2.clauses
+                    if unsat_F1:
+                        return -v
+                    elif unsat_F2:
+                        return v
+                    else:
+                        w[v] = self.diff(minclauses, F1)
+                        w[-v] = self.diff(minclauses, F2)
+                        H[v] = w[-v]*w[v]*1024 + w[-v] + w[v]   
+                    if len(H) == 5:
+                        return max(H.items(), key=lambda l: l[1])[0]
+
+        if len(H) > 0:
+            return max(H.items(), key=lambda l: l[1])[0]
+        else:
+            return self.random_split()
+
+
+    def minclauses(self):
+        minclauses = []
+        minlen = float('inf')
+        for clause in self.clauses:
+            if len(clause) < minlen:
+                minlen = len(clause)
+                minclauses = [clause]
+            if len(clause) == minlen:
+                minclauses += [clause]
+        return minclauses
+    
+    def diff(self, minclauses, other):
+        #return len(self.clauses) - len(other.clauses)
+        dif = [clause for clause in minclauses if clause not in other.clauses]
+        return len(dif) 
 
     def print_sol(self):
         """

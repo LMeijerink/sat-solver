@@ -33,6 +33,8 @@ class SATSolver:
             s = cnf.random_split()
         elif self.heuristic == 'LEFV':
             s = cnf.lefv_split()
+        elif self.heuristic == 'UP':
+            s = cnf.satz()
         self.splits += 1
         cnf1 = copy.deepcopy(cnf)
         cnf1.clauses += [[s]]

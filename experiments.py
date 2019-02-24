@@ -48,10 +48,12 @@ def plot_splits_backtracks(sudoku_rules_file, sudoku_file, n_puzzles, n_runs):
 
     avg_splits_dp, avg_backtracks_dp = bin_metrics_by_clues(None, n_puzzles, n_runs, example_puzzles, clues)
     avg_splits_lefv, avg_backtracks_lefv = bin_metrics_by_clues('LEFV', n_puzzles, n_runs, example_puzzles, clues)
+    avg_splits_up, avg_backtracks_up = bin_metrics_by_clues('UP', n_puzzles, n_runs, example_puzzles, clues)
 
     fig, ax = plt.subplots()
     ax.bar(avg_splits_dp.keys(), avg_splits_dp.values(), color='r', label='DP')
-    ax.bar(avg_splits_lefv.keys(), avg_backtracks_lefv.values(), color='b', label='LEFV')
+    ax.bar(avg_splits_lefv.keys(), avg_splits_lefv.values(), color='b', label='LEFV')
+    ax.bar(avg_splits_up.keys(), avg_splits_up.values(), color='g', label='UP')
     ax.set_xticks(range(16, 26))
     ax.set_xlabel('Number of clues')
     ax.set_ylabel('Average number of splits')
@@ -61,6 +63,7 @@ def plot_splits_backtracks(sudoku_rules_file, sudoku_file, n_puzzles, n_runs):
     fig, ax = plt.subplots()
     ax.bar(avg_backtracks_dp.keys(), avg_backtracks_dp.values(), color='r', label='DP')
     ax.bar(avg_backtracks_lefv.keys(), avg_backtracks_lefv.values(), color='b', label='LEFV')
+    ax.bar(avg_backtracks_up.keys(), avg_backtracks_up.values(), color='g', label='UP')
     ax.set_xticks(range(16, 26))
     ax.set_xlabel('Number of clues')
     ax.set_ylabel('Average number of backtracks')
