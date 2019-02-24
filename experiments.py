@@ -52,7 +52,6 @@ def plot_splits_backtracks(sudoku_rules_file, sudoku_file, n_puzzles, n_runs):
 
     N = len(avg_splits_dp)
     ind = np.arange(N)
-    print(ind)
 
     fig, ax = plt.subplots()
     ax.bar(ind + width, avg_splits_dp.values(), width, color='r', label='DP')
