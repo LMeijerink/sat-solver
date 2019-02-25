@@ -1,5 +1,4 @@
 import numpy as np
-from collections import defaultdict
 import matplotlib.pyplot as plt
 from cnf import CNF
 from sat_solve import SATSolver
@@ -36,10 +35,10 @@ def sudokus_to_DIMACS(filename, rules):
     return puzzles, n_clues
 
 
-def bin_metrics_by_clues(heuristic, n_puzzles, n_runs, example_puzzles, clues):
-    splits_dict = defaultdict(list)
-    backtracks_dict = defaultdict(list)
-    unit_assigns_dict = defaultdict(list)
+def get_metrics(heuristic, n_puzzles, n_runs, example_puzzles):
+    splits = []
+    backtracks = []
+    unit_assigns = []
 
     if heuristic is None:
         print("Solving using DP")
@@ -47,7 +46,7 @@ def bin_metrics_by_clues(heuristic, n_puzzles, n_runs, example_puzzles, clues):
         print("Solving using %s" % heuristic)
 
     i = 1
-    for (puz, n_clues) in zip(example_puzzles[:n_puzzles], clues[:n_puzzles]):
+    for puz in example_puzzles[:n_puzzles]:
         print("Puzzle number %d" % i)
         total_splits = 0
         total_backtracks = 0
@@ -59,70 +58,81 @@ def bin_metrics_by_clues(heuristic, n_puzzles, n_runs, example_puzzles, clues):
             total_splits += sudoku_solver.splits
             total_backtracks += sudoku_solver.backtracks
             total_unit_assigns += cnf.unit_assignments
-        splits_dict[n_clues].append(total_splits / float(t))
-        backtracks_dict[n_clues].append(total_backtracks / float(t))
-        unit_assigns_dict[n_clues].append(total_unit_assigns / float(t))
+        splits += [total_splits / float(t)]
+        backtracks += [total_backtracks / float(t)]
+        unit_assigns += [total_unit_assigns / float(t)]
         i += 1
 
-    avg_splits_dict = {k: np.mean(splits_dict[k]) for k in splits_dict.keys()}
-    avg_backtracks_dict = {k: np.mean(backtracks_dict[k]) for k in backtracks_dict.keys()}
-    avg_unit_assigns_dict = {k: np.mean(unit_assigns_dict[k]) / avg_splits_dict[k] for k in unit_assigns_dict.keys()}
-
-    print(avg_unit_assigns_dict)
-
-    return avg_splits_dict, avg_backtracks_dict, avg_unit_assigns_dict
+    avg_splits = np.mean(splits)
+    avg_backtracks = np.mean(backtracks)
+    avg_unit_assigns = np.mean(unit_assigns)
+    return avg_splits, avg_backtracks, avg_unit_assigns
 
 
-def plot_splits_backtracks(sudoku_rules_file, sudoku_file, n_puzzles, n_runs):
+def plot_metrics(sudoku_file, n_puzzles, n_runs):
     width = 0.3
-    rules = load_sudoku_rules(sudoku_rules_file)
-    example_puzzles, clues = sudokus_to_DIMACS(sudoku_file, rules)
+    xsudoku_rules = load_sudoku_rules('sudoku_rules/xsudoku-rules.txt')
+    sudoku_rules = load_sudoku_rules('sudoku_rules/sudoku-rules.txt')
 
-    avg_splits_dp, avg_backtracks_dp, avg_unit_assigns_dp = bin_metrics_by_clues(None, n_puzzles, n_runs, example_puzzles, clues)
-    avg_splits_lefv, avg_backtracks_lefv, avg_unit_assigns_lefv = bin_metrics_by_clues('LEFV', n_puzzles, n_runs, example_puzzles, clues)
-    avg_splits_up, avg_backtracks_up, avg_unit_assigns_up = bin_metrics_by_clues('UP', n_puzzles, n_runs, example_puzzles, clues)
+    x_examples, clues = sudokus_to_DIMACS(sudoku_file, xsudoku_rules)
+    reg_examples, clues = sudokus_to_DIMACS(sudoku_file, sudoku_rules)
+
+    avg_splits_dp, avg_backtracks_dp, avg_splits_lefv, avg_backtracks_lefv, avg_splits_up, avg_backtracks_up = dict(), dict(), dict(), dict(), dict(), dict()
+    avg_unit_assigns_dp, avg_unit_assigns_lefv, avg_unit_assigns_up = dict(), dict(), dict()
+
+    for examples, label in [(x_examples, 'xsudoku'), (reg_examples, 'sudoku')]:
+        dp_spl, dp_bt, dp_ua = get_metrics(None, n_puzzles, n_runs, examples)
+        avg_splits_dp[label] = dp_spl
+        avg_backtracks_dp[label] = dp_bt
+        avg_unit_assigns_dp[label] = dp_ua
+
+        lf_spl, lf_bt, lf_ua = get_metrics("LEFV", n_puzzles, n_runs, examples)
+        avg_splits_lefv[label] = lf_spl
+        avg_backtracks_lefv[label] = lf_bt
+        avg_unit_assigns_lefv[label] = lf_ua
+
+        up_spl, up_bt, up_ua = get_metrics("UP", n_puzzles, n_runs, examples)
+        avg_splits_up[label] = up_spl
+        avg_backtracks_up[label] = up_bt
+        avg_unit_assigns_up[label] = up_ua
 
     N = len(avg_splits_dp)
     ind = np.arange(N)
 
     fig, ax = plt.subplots()
+
     ax.bar(ind, avg_splits_dp.values(), width, color='r', label='DP')
     ax.bar(ind + width, avg_splits_up.values(), width, color='y', label='UP')
     ax.bar(ind + 2 * width, avg_splits_lefv.values(), width, color='b', label='LEFV')
-
-    ax.set_xticks(ind + width)
-    ax.set_xticklabels(avg_backtracks_lefv.keys())
-
-    ax.set_xlabel('Number of clues')
+    ax.set_xlabel('Rules')
     ax.set_ylabel('Average number of splits')
-    fig.suptitle('Average number of splits vs number of clues')
+    fig.suptitle('Average number of splits vs rules used')
     ax.legend()
+    ax.set_xticks(ind + width)
+    ax.set_xticklabels(avg_splits_up.keys())
 
     fig, ax = plt.subplots()
+
     ax.bar(ind, avg_backtracks_dp.values(), width, color='r', label='DP')
     ax.bar(ind + width, avg_backtracks_up.values(), width, color='y', label='UP')
     ax.bar(ind + 2 * width, avg_backtracks_lefv.values(), width, color='b', label='LEFV')
-
-    ax.set_xticks(ind + width)
-
-    ax.set_xticklabels(avg_backtracks_lefv.keys())
-    ax.set_xlabel('Number of clues')
+    ax.set_xlabel('Rules')
     ax.set_ylabel('Average number of backtracks')
-    fig.suptitle('Average number of backtracks vs number of clues')
+    fig.suptitle('Average number of backtracks vs rules used')
     ax.legend()
+    ax.set_xticks(ind + width)
+    ax.set_xticklabels(avg_splits_up.keys())
 
     fig, ax = plt.subplots()
     ax.bar(ind, avg_unit_assigns_dp.values(), width, color='r', label='DP')
     ax.bar(ind + width, avg_unit_assigns_lefv.values(), width, color='y', label='UP')
     ax.bar(ind + 2 * width, avg_unit_assigns_up.values(), width, color='b', label='LEFV')
-
-    ax.set_xticks(ind + width)
-
-    ax.set_xticklabels(avg_backtracks_lefv.keys())
-    ax.set_xlabel('Number of clues')
-    ax.set_ylabel('Average number of variables resolved by unit propagation')
-    fig.suptitle('Average number of variables in unit propagation vs number of clues')
+    ax.set_xlabel('Rules')
+    ax.set_ylabel('Average number of backtracks')
+    fig.suptitle('Average number of unit assignments vs rules used')
     ax.legend()
+    ax.set_xticks(ind + width)
+    ax.set_xticklabels(avg_splits_up.keys())
 
     plt.show()
 
@@ -133,4 +143,4 @@ if __name__ == '__main__':
     n_puzzles = 30
     n_runs = 1
 
-    plot_splits_backtracks(sudoku_rules_file, sudoku_file, n_puzzles, n_runs)
+    plot_metrics(sudoku_file, n_puzzles, n_runs)
