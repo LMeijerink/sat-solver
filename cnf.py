@@ -2,6 +2,7 @@ import numpy as np
 from collections import defaultdict
 import copy
 
+
 class CNF:
     def __init__(self, dimacs_str):
         """
@@ -14,6 +15,7 @@ class CNF:
         self.occurences = defaultdict(int)
         self.load_clauses(dimacs_str)
         self.lefv_clause = []
+        self.unit_assignments = 0
 
     def load_clauses(self, dimacs_str):
         """
@@ -45,6 +47,9 @@ class CNF:
                 # Conflict encountered
                 if np.sign(clause[0]) == -self.assign[np.abs(clause[0])]:
                     return False
+                # Otherwise make an assignment
+                if self.assign[np.abs(clause[0])] == 0:
+                    self.unit_assignments += 1
                 self.assign[np.abs(clause[0])] = np.sign(clause[0])
             else:
                 non_unit_clauses += [clause]
@@ -123,17 +128,18 @@ class CNF:
             variables = [v for v in self.variables if self.assign[v] == 0]
             return np.random.choice(variables)
 
-
     def satz(self):
         """
-        Now: Prop_0, prop is true for each variable
+        Choose a variable based on the Satz heuristic
+        :return: Chosen variable
         """
         w = defaultdict(int)
         H = defaultdict(int)
         minclauses = self.minclauses()
         for v in self.variables:
-              if (self.assign[v] == 0):
-                if ((self.occurences[v] + self.occurences[-v])/2 >= 14 and (self.occurences[v] >= 4 and self.occurences[-v] >= 4)):
+            if self.assign[v] == 0:
+                if ((self.occurences[v] + self.occurences[-v]) / 2 >= 14 and (
+                        self.occurences[v] >= 4 and self.occurences[-v] >= 4)):
                     F1 = copy.deepcopy(self)
                     F2 = copy.deepcopy(self)
                     F1.clauses += [[v]]
@@ -149,7 +155,7 @@ class CNF:
                     else:
                         w[v] = self.diff(minclauses, F1)
                         w[-v] = self.diff(minclauses, F2)
-                        H[v] = w[-v]*w[v]*1024 + w[-v] + w[v]   
+                        H[v] = w[-v] * w[v] * 1024 + w[-v] + w[v]
                     if len(H) == 5:
                         return max(H.items(), key=lambda l: l[1])[0]
 
@@ -157,7 +163,6 @@ class CNF:
             return max(H.items(), key=lambda l: l[1])[0]
         else:
             return self.random_split()
-
 
     def minclauses(self):
         minclauses = []
@@ -169,11 +174,11 @@ class CNF:
             if len(clause) == minlen:
                 minclauses += [clause]
         return minclauses
-    
+
     def diff(self, minclauses, other):
-        #return len(self.clauses) - len(other.clauses)
+        # return len(self.clauses) - len(other.clauses)
         dif = [clause for clause in minclauses if clause not in other.clauses]
-        return len(dif) 
+        return len(dif)
 
     def print_sol(self):
         """

@@ -41,52 +41,18 @@ class SATSolver:
         if self.solve(cnf1):
             cnf.assign = cnf1.assign
             cnf.clauses = cnf1.clauses
+            cnf.unit_assignments = cnf1.unit_assignments - 1
             return True
         else:
+            cnf.unit_assignments = cnf1.unit_assignments - 1
             self.backtracks += 1
             cnf2 = copy.deepcopy(cnf)
             cnf2.clauses += [[-s]]
             if self.solve(cnf2):
                 cnf.assign = cnf2.assign
                 cnf.clauses = cnf2.clauses
+                cnf.unit_assignments = cnf2.unit_assignments - 1
                 return True
+            cnf.unit_assignments = cnf2.unit_assignments - 1
         return False
 
-
-def sudokus_to_DIMACS(filename, rules):
-    """
-    Takes in file of sudokus and returns a list of puzzles in DIMACS format
-    :param filename: Filename of sudoku problems
-    :param rules: String of sudoku rules
-    :return: String containing rules and sudoku problems in DIMACS format, and the number of clues in each problem
-    """
-    puzzles = []
-    n_clues = []
-    with open(filename, 'r') as f:
-        for line in f.read().splitlines():
-            line = np.array(list(line))
-            matrix = np.reshape(line, (9, 9))
-            clauses = rules
-            clues = 0
-            for x in range(len(matrix)):
-                for y in range(len(matrix[x])):
-                    if matrix[x, y] != '.':
-                        clauses += str(x + 1) + str(y + 1) + matrix[x, y] + ' 0\n'
-                        clues += 1
-            puzzles += [clauses]
-            n_clues.append(clues)
-    return puzzles, n_clues
-
-
-if __name__ == '__main__':
-    sudokufile = 'test_sudokus/1000 sudokus.txt'
-    n_puzzles = 30
-    n_runs = 5
-
-    # Load in rules, same for every sudoku
-    with open('sudoku-rules.txt') as f:
-        rules = f.read()
-
-    example_puzzles, clues = sudokus_to_DIMACS(sudokufile, rules)
-
-    pass
