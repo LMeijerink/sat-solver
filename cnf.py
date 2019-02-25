@@ -60,8 +60,10 @@ class CNF:
             if self.assign[var] == 0:
                 if self.occurences[var] != 0 and self.occurences[-var] == 0:
                     self.assign[var] = 1
+                    print("pure")
                 elif self.occurences[-var] != 0 and self.occurences[var] == 0:
                     self.assign[var] = -1
+                    print("pure")
 
     def rm_redundant_clauses(self):
         """
@@ -109,7 +111,8 @@ class CNF:
         :return: Chosen variable
         """
         variables = [v for v in self.variables if self.assign[v] == 0]
-        return np.random.choice(variables)
+        #sgn = np.random.choice([1,-1])
+        return -1*np.random.choice(variables)
 
     def lefv_split(self):
         """
@@ -156,6 +159,7 @@ class CNF:
         if len(H) > 0:
             return max(H.items(), key=lambda l: l[1])[0]
         else:
+            #print('random')
             return self.random_split()
 
 
