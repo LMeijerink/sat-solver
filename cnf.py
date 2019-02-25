@@ -111,8 +111,8 @@ class CNF:
         :return: Chosen variable
         """
         variables = [v for v in self.variables if self.assign[v] == 0]
-        #sgn = np.random.choice([1,-1])
-        return -1*np.random.choice(variables)
+        sgn = np.random.choice([1,-1])
+        return sgn*np.random.choice(variables)
 
     def lefv_split(self):
         """
