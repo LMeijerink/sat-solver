@@ -66,7 +66,7 @@ def get_metrics(heuristic, n_puzzles, n_runs, example_puzzles):
     avg_splits = np.mean(splits)
     avg_backtracks = np.mean(backtracks)
     avg_unit_assigns = np.mean(unit_assigns)
-    return avg_splits, avg_backtracks, avg_unit_assigns
+    return avg_splits, avg_backtracks, avg_unit_assigns/avg_splits
 
 
 def plot_metrics(sudoku_file, n_puzzles, n_runs):
@@ -106,7 +106,7 @@ def plot_metrics(sudoku_file, n_puzzles, n_runs):
     ax.bar(ind + 2 * width, avg_splits_lefv.values(), width, color='b', label='LEFV')
     ax.set_xlabel('Rules')
     ax.set_ylabel('Average number of splits')
-    fig.suptitle('Average number of splits vs rules used')
+    fig.suptitle('Average number of splits for Sudoku and X-Sudoku')
     ax.legend()
     ax.set_xticks(ind + width)
     ax.set_xticklabels(avg_splits_up.keys())
@@ -118,7 +118,7 @@ def plot_metrics(sudoku_file, n_puzzles, n_runs):
     ax.bar(ind + 2 * width, avg_backtracks_lefv.values(), width, color='b', label='LEFV')
     ax.set_xlabel('Rules')
     ax.set_ylabel('Average number of backtracks')
-    fig.suptitle('Average number of backtracks vs rules used')
+    fig.suptitle('Average number of backtracks for Sudoku and X-Sudoku')
     ax.legend()
     ax.set_xticks(ind + width)
     ax.set_xticklabels(avg_splits_up.keys())
@@ -128,8 +128,8 @@ def plot_metrics(sudoku_file, n_puzzles, n_runs):
     ax.bar(ind + width, avg_unit_assigns_lefv.values(), width, color='y', label='UP')
     ax.bar(ind + 2 * width, avg_unit_assigns_up.values(), width, color='b', label='LEFV')
     ax.set_xlabel('Rules')
-    ax.set_ylabel('Average number of backtracks')
-    fig.suptitle('Average number of unit assignments vs rules used')
+    ax.set_ylabel('Average number of unit assignments per split')
+    fig.suptitle('Average number of unit assignments per split for Sudoku and X-Sudoku')
     ax.legend()
     ax.set_xticks(ind + width)
     ax.set_xticklabels(avg_splits_up.keys())
@@ -138,7 +138,6 @@ def plot_metrics(sudoku_file, n_puzzles, n_runs):
 
 
 if __name__ == '__main__':
-    sudoku_rules_file = 'sudoku_rules/xsudoku-rules.txt'
     sudoku_file = 'test_sudokus/xsudoku_extreme.txt'
     n_puzzles = 30
     n_runs = 1
