@@ -28,6 +28,7 @@ if __name__ == '__main__':
     parser.add_argument('inputfile', help="Input file containing SAT problem in DIMACS form")
     args = vars(parser.parse_args())
     if args['S1'] == args['S2'] == args['S3'] is False:
+        print("Choose one among S1/S1/S3")
         parser.print_help()
         parser.exit(1)
 
@@ -42,7 +43,7 @@ if __name__ == '__main__':
     elif args['S2'] is True:
         heuristic = 'UP'
     elif args['S3'] is True:
-        heuristic = 'lefv'
+        heuristic = 'LEFV'
 
     cnf = CNF(dimacs_str)
     sat_solver = SATSolver(heuristic=heuristic)
