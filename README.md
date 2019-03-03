@@ -17,5 +17,5 @@ Arguments: <br/>
 `-S3`: Solve using DP with Last Encountered Free Variable (LEFV) heuristic <br/>
 
 ## Output
-If the problem is satisfiable, the solution is written in DIMACS form to file `outputfile.out` where `outputfile` has the same name as `inputfile` without the file extension.
+If the problem is satisfiable, the solution is written in DIMACS form to the file `outputfile.out` where `outputfile` has the same name as `inputfile` except for the file extension.
 If the problem is not satisifiable, `outputfile.out` is empty.
