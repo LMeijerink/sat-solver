@@ -19,3 +19,7 @@ Arguments: <br/>
 ## Output
 If the problem is satisfiable, the solution is written in DIMACS form to the file `outputfile.out` where `outputfile` has the same name as `inputfile` except for the file extension.
 If the problem is not satisifiable, `outputfile.out` is empty.
+
+
+## Troubleshooting
+If you encounter 'permission denied' errors, it is because `SAT.py` does not have execute permission. Use `chmod +x SAT.py` to make it executable. 
