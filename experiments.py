@@ -67,7 +67,6 @@ def get_metrics(heuristic, n_puzzles, n_runs, example_puzzles):
     avg_backtracks = np.mean(backtracks)
     avg_unit_assigns = np.mean(unit_assigns)
     standarddeviations = np.std(splits)/2, np.std(backtracks)/2, np.std(unit_assigns)/2
-
     return avg_splits, avg_backtracks, avg_unit_assigns/avg_splits, standarddeviations
 
 
@@ -104,50 +103,70 @@ def plot_metrics(sudoku_file, n_puzzles, n_runs):
     N = len(avg_splits_dp)
     ind = np.arange(N)
 
-    fig, ax = plt.subplots()
+    fig, ax = plt.subplots(figsize=(5.2, 5))
 
     ax.bar(ind, avg_splits_dp.values(), width, yerr= [dp_stds['xsudoku'][0], dp_stds['sudoku'][0]], color='tab:blue', label='DP')
     ax.bar(ind + width, avg_splits_up.values(), width, yerr= [up_stds['xsudoku'][0], up_stds['sudoku'][0]],  color='tab:red', label='UP')
     ax.bar(ind + 2 * width, avg_splits_lefv.values(), width, yerr= [lf_stds['xsudoku'][0], lf_stds['sudoku'][0]], color='tab:pink', label='LEFV')
-    ax.set_ylim(bottom=0)
-    ax.set_xlabel('Rules')
-    ax.set_ylabel('Average number of splits')
-    fig.suptitle('Average number of splits for Sudoku and X-Sudoku')
-    ax.legend()
-    ax.set_xticks(ind + width)
-    ax.set_xticklabels(avg_splits_dp.keys())
+    for i, value in zip(ind, avg_splits_dp.values()):
+        ax.text(i - 0.15, value+0.3, str(round(value,1)), fontsize="large")
+    for i, value in zip(ind + width, avg_splits_up.values()):
+        ax.text(i - 0.15, value+0.3, str(round(value,1)), fontsize="large")
+    for i, value in zip(ind + 2*width, avg_splits_lefv.values()):
+        ax.text(i - 0.15, value+0.3, str(round(value,1)), fontsize="large")
 
-    fig, ax = plt.subplots()
+    ax.set_ylim(bottom=0)
+    ax.set_xlabel('Rules',fontsize="large")
+    ax.set_ylabel('Average number of splits', fontsize="large")
+    fig.suptitle('Average number of splits\nfor Sudoku and X-Sudoku')
+    ax.legend(fontsize='large')
+    ax.set_xticks(ind + width)
+    ax.set_xticklabels(avg_splits_dp.keys(), fontsize="large")
+
+    fig, ax = plt.subplots(figsize=(5.2, 5))
 
     ax.bar(ind, avg_backtracks_dp.values(), width, yerr= [dp_stds['xsudoku'][1], dp_stds['sudoku'][1]], color='tab:blue', label='DP')
     ax.bar(ind + width, avg_backtracks_up.values(), width, yerr= [up_stds['xsudoku'][1], up_stds['sudoku'][1]], color='tab:red', label='UP')
     ax.bar(ind + 2 * width, avg_backtracks_lefv.values(), width, yerr= [lf_stds['xsudoku'][1], lf_stds['sudoku'][1]], color='tab:pink', label='LEFV')
-    ax.set_ylim(bottom=0)
-    ax.set_xlabel('Rules')
-    ax.set_ylabel('Average number of backtracks')
-    fig.suptitle('Average number of backtracks for Sudoku and X-Sudoku')
-    ax.legend()
-    ax.set_xticks(ind + width)
-    ax.set_xticklabels(avg_splits_up.keys())
+    for i, value in zip(ind, avg_backtracks_dp.values()):
+        ax.text(i - 0.15, value+0.3, str(round(value,1)), fontsize="large")
+    for i, value in zip(ind + width, avg_backtracks_up.values()):
+        ax.text(i - 0.15, value+0.3, str(round(value,1)), fontsize="large")
+    for i, value in zip(ind + 2*width, avg_backtracks_lefv.values()):
+        ax.text(i - 0.15, value+0.3, str(round(value,1)), fontsize="large")
 
-    fig, ax = plt.subplots()
+    ax.set_ylim(bottom=0)
+    ax.set_xlabel('Rules',fontsize="large")
+    ax.set_ylabel('Average number of backtracks', fontsize="large")
+    fig.suptitle('Average number of backtracks \nfor Sudoku and X-Sudoku')
+    ax.legend(fontsize='large')
+    ax.set_xticks(ind + width)
+    ax.set_xticklabels(avg_splits_up.keys(), fontsize="large")
+
+    fig, ax = plt.subplots(figsize=(5.2, 5))
     ax.bar(ind, avg_unit_assigns_dp.values(), width, yerr= [dp_stds['xsudoku'][2], dp_stds['sudoku'][2]], color='tab:blue', label='DP')
     ax.bar(ind + width, avg_unit_assigns_up.values(), width, yerr= [up_stds['xsudoku'][2], up_stds['sudoku'][2]], color='tab:red', label='UP')
     ax.bar(ind + 2 * width, avg_unit_assigns_lefv.values(), width, yerr= [lf_stds['xsudoku'][2], lf_stds['sudoku'][2]], color='tab:pink', label='LEFV')
+    for i, value in zip(ind, avg_unit_assigns_dp.values()):
+        ax.text(i - 0.18, value+5, str(int(value)), fontsize="large")
+    for i, value in zip(ind + width, avg_unit_assigns_up.values()):
+        ax.text(i - 0.18, value+5, str(int(value)), fontsize="large")
+    for i, value in zip(ind + 2*width, avg_unit_assigns_lefv.values()):
+        ax.text(i - 0.18, value+5, str(int(value)), fontsize="large")
+
     ax.set_ylim(bottom=0)
-    ax.set_xlabel('Rules')
-    ax.set_ylabel('Average number of unit assignments per split')
-    fig.suptitle('Average number of unit assignments per split for Sudoku and X-Sudoku')
-    ax.legend()
+    ax.set_xlabel('Rules',fontsize="large")
+    ax.set_ylabel('Average number of unit assignments per split', fontsize="large")
+    fig.suptitle('Average number of unit assignments \nper split for Sudoku and X-Sudoku')
+    ax.legend(fontsize='large')
     ax.set_xticks(ind + width)
-    ax.set_xticklabels(avg_splits_up.keys())
+    ax.set_xticklabels(avg_splits_up.keys(), fontsize="large")
 
     plt.show()
 
 
 if __name__ == '__main__':
     sudoku_file = 'test_sudokus/xsudoku_easiest.txt'
-    n_puzzles = 10
+    n_puzzles = 30
     n_runs = 1
-
     plot_metrics(sudoku_file, n_puzzles, n_runs)
