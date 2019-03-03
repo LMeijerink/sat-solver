@@ -16,7 +16,10 @@ def write_sol_to_file(cnf, output_file, satisfiable=True):
     with open(output_file, 'w') as f:
         if satisfiable:
             for variable in cnf.variables:
-                f.write(str(cnf.assign[variable] * variable) + " 0\n")
+                if cnf.assign[variable] != 0:
+                    f.write(str(cnf.assign[variable] * variable) + " 0\n")
+                else:
+                    f.write(str(variable) + " 0\n")
         else:
             f.write("")
     f.close()
