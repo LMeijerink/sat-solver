@@ -8,7 +8,7 @@ Python 3 and the following packages:
 - argparse
 
 ## Usage
-`./SAT.py [-h] [-S1] [-S2] [-S3] inputfile`
+`./SAT.py [-h] [-S1] [-S2] [-S3] inputfile` <br/>
 Arguments: <br/>
 `inputfile`: Input file containing SAT problem in DIMACS form <br/>
 `-h, --help`: Show help message and exit <br/>
