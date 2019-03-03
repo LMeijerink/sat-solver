@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+
 import argparse
 from sat_solve import SATSolver
 from cnf import CNF
