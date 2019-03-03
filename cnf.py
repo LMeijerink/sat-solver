@@ -24,7 +24,7 @@ class CNF:
         :return: None
         """
         for line in dimacs_str.splitlines():
-            if line[0] != "c" and line[0] != "p":
+            if line != '' and line[0] != '0' and (line[0] == "-" or line[0].isdigit()):
                 clause = []
                 for l in line[:-1].split():
                     literal = int(l)
