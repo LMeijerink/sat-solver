@@ -1,6 +1,4 @@
-import time
 from cnf import CNF
-import numpy as np
 import copy
 
 
@@ -24,7 +22,6 @@ class SATSolver:
         if not cnf.simplify():
             return False
         if cnf.clauses == []:
-            # cnf.print_sol()
             return True
         if [] in cnf.clauses:
             return False
@@ -55,4 +52,3 @@ class SATSolver:
                 return True
             cnf.unit_assignments = cnf2.unit_assignments - 1
         return False
-

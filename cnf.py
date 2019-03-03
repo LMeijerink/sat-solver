@@ -177,7 +177,6 @@ class CNF:
         return minclauses
 
     def diff(self, minclauses, other):
-        # return len(self.clauses) - len(other.clauses)
         dif = [clause for clause in minclauses if clause not in other.clauses]
         return len(dif)
 
